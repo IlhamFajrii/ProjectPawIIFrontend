@@ -6,7 +6,7 @@ import { iconButtonClass } from '../../../components/ui/buttonClass';
 import type { ListingType } from '../../../lib/api/types';
 import { MAX_URLS } from '../../../lib/schemas';
 import { useCurrentUser } from '../../../lib/session';
-import { uploadPhoto } from '../uploadPhoto';
+import { uploadPhoto } from '../../../lib/uploadPhoto';
 
 interface Props {
   urls: string[];

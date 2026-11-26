@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ChevronRight, LogOut } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronRight, ImagePlus, LogOut, Trash2 } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Link } from 'react-router';
 import type { z } from 'zod';
@@ -21,6 +21,7 @@ import { queryKeys } from '../../../lib/queryKeys';
 import { useCurrentUser } from '../../../lib/session';
 import { setThemeWithReveal, useThemePreference } from '../../../lib/theme';
 import { useToast } from '../../../lib/toast';
+import { uploadPhoto } from '../../../lib/uploadPhoto';
 import { useSignOut } from '../../../lib/useSignOut';
 import { zodResolver } from '../../../lib/zodResolver';
 import { profileSchema } from '../schema';
@@ -31,7 +32,7 @@ const LABELS: Record<keyof Input, string> = {
   name: 'Nama',
   district: 'Kecamatan',
   email: 'Email',
-  avatarUrl: 'URL foto profil',
+  avatarUrl: 'Tautan foto profil',
 };
 
 export default function ProfilePage() {
@@ -41,11 +42,16 @@ export default function ProfilePage() {
   const theme = useThemePreference();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState<string>();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [photoError, setPhotoError] = useState<string>();
+  const [showLink, setShowLink] = useState(false);
   const {
     register,
     handleSubmit,
     setError,
     setFocus,
+    setValue,
     control,
     formState: { errors, isDirty },
   } = useForm<Input, unknown, z.output<typeof profileSchema>>({
@@ -75,6 +81,20 @@ export default function ProfilePage() {
       ),
   });
 
+  const setPhoto = (url: string) => setValue('avatarUrl', url, { shouldDirty: true, shouldValidate: true });
+
+  const pickPhoto = async (file: File) => {
+    setPhotoError(undefined);
+    setUploading(true);
+    try {
+      setPhoto(await uploadPhoto(file, user._id, 'avatars'));
+    } catch (cause) {
+      setPhotoError(cause instanceof Error ? cause.message : 'Foto gagal diunggah. Coba lagi.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <Page title="Profil" width="narrow">
       <form
@@ -88,7 +108,44 @@ export default function ProfilePage() {
         <FormSummary message={message} errors={flattenErrors(errors)} labels={LABELS} onSelect={(field) => setFocus(field as keyof Input)} />
         <div className="flex items-center gap-4">
           <Avatar name={name || user.name} src={avatarUrl} size="lg" />
-          <p className="text-sm text-muted">Pratinjau foto profil. Kalau tautannya rusak, yang tampil huruf awal namamu.</p>
+          <div className="grid min-w-0 gap-2">
+            <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" loading={uploading} onClick={() => fileInput.current?.click()}>
+                <ImagePlus className="size-5" aria-hidden="true" />
+                Pilih foto
+              </Button>
+              {avatarUrl && (
+                <Button variant="text" disabled={uploading} onClick={() => setPhoto('')}>
+                  <Trash2 className="size-5" aria-hidden="true" />
+                  Hapus foto
+                </Button>
+              )}
+            </div>
+            <p role="status" className="text-sm text-muted">
+              {uploading
+                ? 'Mengunggah foto…'
+                : avatarUrl !== (user.avatarUrl ?? '')
+                  ? 'Tekan "Simpan perubahan" untuk memakai foto ini.'
+                  : 'Dari galeri atau kamera. Foto profil bisa dilihat siapa saja.'}
+            </p>
+            {photoError && (
+              <p role="alert" className="text-sm font-medium text-danger">
+                {photoError}
+              </p>
+            )}
+          </div>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              // Dikosongkan agar foto yang sama bisa dipilih lagi.
+              event.target.value = '';
+              if (file) void pickPhoto(file);
+            }}
+          />
         </div>
         <TextField {...register('name')} label={LABELS.name} maxLength={80} autoComplete="name" error={errors.name?.message} />
         <TextField label="Nomor HP" value={user.phone} readOnly hint="Nomor HP belum bisa diubah." />
@@ -106,17 +163,23 @@ export default function ProfilePage() {
           options={DISTRICTS.map((value) => ({ value, label: value }))}
           error={errors.district?.message}
         />
-        <TextField
-          {...register('avatarUrl')}
-          label={LABELS.avatarUrl}
-          type="url"
-          inputMode="url"
-          placeholder="https://"
-          autoComplete="off"
-          error={errors.avatarUrl?.message}
-        />
+        <details
+          open={showLink || Boolean(errors.avatarUrl)}
+          onToggle={(event) => setShowLink(event.currentTarget.open)}
+        >
+          <summary className="min-h-11 content-center text-sm font-medium">Atau tempel tautan foto</summary>
+          <TextField
+            {...register('avatarUrl')}
+            label={LABELS.avatarUrl}
+            type="url"
+            inputMode="url"
+            placeholder="https://"
+            autoComplete="off"
+            error={errors.avatarUrl?.message}
+          />
+        </details>
         <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" loading={save.isPending} disabled={!isDirty}>
+          <Button type="submit" loading={save.isPending} disabled={!isDirty || uploading}>
             Simpan perubahan
           </Button>
           <Link to={`/pengguna/${user._id}`} className={buttonClass('text')}>

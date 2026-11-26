@@ -1,14 +1,15 @@
-import { buildUrl } from '../../lib/api/client';
-import { toListingPhoto } from '../../lib/image';
-import { readToken } from '../../lib/token';
+import { buildUrl } from './api/client';
+import { toUploadPhoto } from './image';
+import { readToken } from './token';
 
 /** Mengecilkan foto, lalu mengunggahnya langsung ke Vercel Blob dengan izin dari backend. */
-export async function uploadPhoto(file: Blob, userId: string) {
-  const photo = await toListingPhoto(file);
+export async function uploadPhoto(file: Blob, userId: string, kind: 'listings' | 'avatars' = 'listings') {
+  // Foto profil hanya tampil kecil.
+  const photo = await toUploadPhoto(file, kind === 'avatars' ? 512 : undefined);
   // Diunduh hanya saat pengguna benar-benar mengunggah.
   const { upload } = await import('@vercel/blob/client');
   try {
-    const blob = await upload(`listings/${userId}/foto.jpg`, photo, {
+    const blob = await upload(`${kind}/${userId}/foto.jpg`, photo, {
       access: 'public',
       contentType: 'image/jpeg',
       handleUploadUrl: buildUrl('/uploads'),

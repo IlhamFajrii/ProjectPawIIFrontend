@@ -63,15 +63,15 @@ const toBase64 = (blob: Blob) =>
   });
 
 /**
- * Foto listing selalu digambar ulang menjadi JPEG maksimal 3 MB, sehingga data EXIF
+ * Foto unggahan selalu digambar ulang menjadi JPEG maksimal 3 MB, sehingga data EXIF
  * (termasuk lokasi pengambilan) tidak ikut diunggah.
  */
-export async function toListingPhoto(file: Blob) {
+export async function toUploadPhoto(file: Blob, maxSide = Infinity) {
   const bitmap = await createImageBitmap(file).catch(() => {
     throw new Error('File ini tidak bisa dibuka sebagai foto. Pakai JPEG, PNG, atau WebP.');
   });
   try {
-    const blob = await shrinkToLimit((side, quality) => renderJpeg(bitmap, side, quality));
+    const blob = await shrinkToLimit((side, quality) => renderJpeg(bitmap, Math.min(side, maxSide), quality));
     if (!blob) throw new Error('Foto masih lebih dari 3 MB setelah diperkecil. Coba foto lain.');
     return blob;
   } finally {
