@@ -840,6 +840,73 @@ html[data-reveal]::view-transition-new(root) {
   }
 }
 
+/* ---------- Mata password ---------- */
+/* Tombol bawaan Edge disembunyikan agar tidak ada dua mata. */
+.password-input::-ms-reveal {
+  display: none;
+}
+
+.eye-open,
+.eye-shut {
+  transform-origin: 12px 12px;
+}
+
+.eye-open,
+.eye[aria-pressed="true"] .eye-shut {
+  opacity: 0;
+  transform: scaleY(0.1);
+}
+
+.eye[aria-pressed="true"] .eye-open {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .eye-open,
+  .eye-shut {
+    transition:
+      opacity 180ms ease-out,
+      transform 260ms var(--ease-long);
+  }
+
+  .eye-pupil {
+    translate: var(--look-x, 0) var(--look-y, 0);
+    transition: translate 120ms ease-out;
+  }
+
+  /* Sesekali berkedip selama password terlihat. */
+  .eye[aria-pressed="true"] .eye-open {
+    animation: eye-blink 4s ease-in-out 1.5s infinite;
+  }
+
+  /* Huruf yang baru terlihat menajam dari kabur. */
+  .password-input[type="text"] {
+    animation: password-focus 360ms ease-out;
+  }
+}
+
+@keyframes eye-blink {
+  0%,
+  92%,
+  100% {
+    scale: 1 1;
+  }
+  96% {
+    scale: 1 0.1;
+  }
+}
+
+@keyframes password-focus {
+  from {
+    color: transparent;
+    text-shadow: 0 0 8px var(--ink);
+  }
+  to {
+    text-shadow: 0 0 0 var(--ink);
+  }
+}
+
 /* ---------- Rail horizontal ---------- */
 .rail {
   display: grid;

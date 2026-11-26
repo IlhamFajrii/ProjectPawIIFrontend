@@ -1,4 +1,5 @@
 import { useId, type ComponentProps, type ReactNode } from 'react';
+import { PasswordInput } from './PasswordInput';
 
 interface FieldMeta {
   label: string;
@@ -43,9 +44,10 @@ function Field({ label, hint, error, children }: FieldMeta & { children: (wiring
 }
 
 export function TextField({ label, hint, error, className = '', ...props }: FieldMeta & ComponentProps<'input'>) {
+  const Input = props.type === 'password' ? PasswordInput : 'input';
   return (
     <Field label={label} hint={hint} error={error}>
-      {(wiring) => <input {...props} {...wiring} className={`${CONTROL} min-h-11 ${className}`} />}
+      {(wiring) => <Input {...props} {...wiring} className={`${CONTROL} min-h-11 ${className}`} />}
     </Field>
   );
 }
