@@ -1,4 +1,4 @@
-import type { AiImageType } from '../../lib/api/ai';
+import type { AiImageType } from './api/ai';
 
 export const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 const MAX_SIDES = [2048, 1600, 1280, 1024, 768];
@@ -61,6 +61,23 @@ const toBase64 = (blob: Blob) =>
     reader.onerror = () => reject(new Error('Foto gagal dibaca.'));
     reader.readAsDataURL(blob);
   });
+
+/**
+ * Foto listing selalu digambar ulang menjadi JPEG maksimal 3 MB, sehingga data EXIF
+ * (termasuk lokasi pengambilan) tidak ikut diunggah.
+ */
+export async function toListingPhoto(file: Blob) {
+  const bitmap = await createImageBitmap(file).catch(() => {
+    throw new Error('File ini tidak bisa dibuka sebagai foto. Pakai JPEG, PNG, atau WebP.');
+  });
+  try {
+    const blob = await shrinkToLimit((side, quality) => renderJpeg(bitmap, side, quality));
+    if (!blob) throw new Error('Foto masih lebih dari 3 MB setelah diperkecil. Coba foto lain.');
+    return blob;
+  } finally {
+    bitmap.close();
+  }
+}
 
 /** Menyiapkan foto untuk AI draft: maksimal 3 MB, base64 tanpa awalan data URL. */
 export async function prepareImage(file: Blob) {

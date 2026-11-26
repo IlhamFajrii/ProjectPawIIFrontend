@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { ListingImage } from '../../../components/listing/ListingImage';
 import { Button } from '../../../components/ui/Button';
 import { SelectField, TextareaField, TextField } from '../../../components/ui/Field';
 import { FormSummary } from '../../../components/ui/FormSummary';
@@ -13,6 +12,7 @@ import { applyServerErrors, flattenErrors } from '../../../lib/formErrors';
 import { zodResolver } from '../../../lib/zodResolver';
 import { listingSchema, MAX_PRICE, type ListingFormInput, type ListingFormOutput } from '../listingSchema';
 import type { AssistantProps } from './assistant';
+import { PhotoPicker } from './PhotoPicker';
 
 const LABELS: Record<keyof ListingFormInput, string> = {
   type: 'Tipe',
@@ -37,6 +37,8 @@ interface Props {
 
 export function ListingForm({ defaultValues, lockType, submitLabel, pending, onSubmit, assistant }: Props) {
   const [message, setMessage] = useState<string>();
+  const [uploading, setUploading] = useState(false);
+  const [showLinks, setShowLinks] = useState(false);
   const {
     register,
     handleSubmit,
@@ -147,26 +149,30 @@ export function ListingForm({ defaultValues, lockType, submitLabel, pending, onS
         error={errors.district?.message}
       />
 
-      <UrlListFields
-        legend="Foto (opsional)"
-        hint="Tempel tautan foto yang diawali https://. Maksimal 8. Unggah file belum tersedia."
-        rows={images.fields}
-        inputProps={(index) => register(`images.${index}.url`)}
-        error={(index) => errors.images?.[index]?.url?.message}
-        listError={errors.images?.message ?? errors.images?.root?.message}
-        preview={(index) => {
-          const url = urls[index]?.url;
-          return url ? (
-            <div className="w-32">
-              <ListingImage src={url} alt={`Pratinjau foto ${index + 1}`} type={type} compact />
-            </div>
-          ) : null;
-        }}
-        onAdd={() => images.append({ url: '' })}
+      <PhotoPicker
+        urls={urls.map((item) => item.url)}
+        type={type}
+        onAdd={(url) => images.append({ url }, { shouldFocus: false })}
         onRemove={images.remove}
+        onBusyChange={setUploading}
       />
+      {/* Terbuka sendiri bila ada tautan yang salah, agar pesan errornya terlihat. */}
+      <details open={showLinks || Boolean(errors.images)} onToggle={(event) => setShowLinks(event.currentTarget.open)}>
+        <summary className="min-h-11 content-center text-sm font-medium">Atau tempel tautan foto</summary>
+        <UrlListFields
+          legend="Tautan foto"
+          hint="Tautan harus diawali https://. Foto yang diunggah juga tercantum di sini."
+          rows={images.fields}
+          inputProps={(index) => register(`images.${index}.url`)}
+          error={(index) => errors.images?.[index]?.url?.message}
+          listError={errors.images?.message ?? errors.images?.root?.message}
+          onAdd={() => images.append({ url: '' })}
+          onRemove={images.remove}
+        />
+      </details>
 
-      <Button type="submit" loading={pending || isSubmitting} className="justify-self-start">
+      {/* Menunggu unggahan selesai, agar foto tidak tertinggal saat disimpan. */}
+      <Button type="submit" loading={pending || isSubmitting} disabled={uploading} className="justify-self-start">
         {submitLabel}
       </Button>
     </form>

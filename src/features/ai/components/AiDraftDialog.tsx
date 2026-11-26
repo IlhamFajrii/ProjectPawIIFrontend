@@ -7,7 +7,7 @@ import { TextareaField } from '../../../components/ui/Field';
 import { draftListing } from '../../../lib/api/ai';
 import { ApiError } from '../../../lib/api/client';
 import type { AiDraft } from '../../../lib/api/types';
-import { prepareImage } from '../image';
+import { prepareImage } from '../../../lib/image';
 
 type Values = AiDraft;
 

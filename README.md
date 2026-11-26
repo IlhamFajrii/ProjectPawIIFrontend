@@ -134,7 +134,7 @@ Diukur di komputer yang sama saat sedang lebih sibuk, sehingga angkanya tidak se
 
 Berasal dari backend:
 
-- Foto hanya lewat URL `https`. Belum ada unggah file. Host foto bisa melihat alamat IP pengunjung.
+- Foto diunggah langsung dari browser ke Vercel Blob (publik), atau ditempel sebagai URL `https`. Foto yang dihapus dari listing tidak otomatis terhapus dari Blob. Host foto bisa melihat alamat IP pengunjung.
 - Listing yang dinonaktifkan tidak bisa diaktifkan lagi.
 - Pesanan tidak menyimpan foto.
 - Chat memakai polling, hanya menampilkan 50 pesan terbaru saat dibuka, tanpa tanda dibaca dan tanpa jumlah belum dibaca.
