@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="description" content="Marketplace lokal Palembang untuk barang, sewa, jasa, dan tugas bantuan, dengan Rekber simulasi." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>PUNYA</title>
+    <script>
+      // Menerapkan tema sebelum render pertama. Isinya dikunci hash CSP di vercel.json.
+      (function () {
+        var preference = null;
+        try {
+          preference = localStorage.getItem('punya.theme');
+        } catch (error) {}
+        var dark =
+          preference === 'dark' ||
+          (preference !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        document.querySelector('meta[name="theme-color"]').content = dark ? '#05070d' : '#ffffff';
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>PUNYA memerlukan JavaScript. Aktifkan JavaScript lalu muat ulang halaman.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,322 @@
+/*
+ * Gerak beranda. Aturannya:
+ * - Tampilan dasar selalu utuh dan terbaca. Semua gerak ada di dalam `no-preference`.
+ * - Gerak yang mengikuti scroll di CSS ada di balik `@supports`, tanpa polyfill.
+ * - Scene 3D (scene.ts) membaca posisi bab `[data-chapter]`.
+ * - Parallax (`[data-depth]`) digerakkan GSAP di parallax.ts; elemen itu tidak diberi animasi atau transisi CSS.
+ */
+
+/* ---------- Scene diam di layar, teks lewat di atasnya ---------- */
+.river {
+  margin-top: calc(var(--spacing-nav) * -1);
+}
+
+.river-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  /* Tampil selagi three.js diunduh, dan bila WebGL tidak tersedia. */
+  background: linear-gradient(var(--scene-night-top), var(--scene-dusk-horizon) 56%, var(--scene-water) 57%);
+}
+
+.river-canvas,
+.river-canvas > canvas,
+.river-scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Menjaga kontras teks di atas langit dan lampu. */
+.river-scrim {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--scene-night-top) 94%, transparent) 22%,
+    color-mix(in srgb, var(--scene-night-top) 68%, transparent) 40%,
+    transparent 64%
+  );
+}
+
+.river-chapters {
+  position: relative;
+  margin-top: -100svh;
+  /* Klik diteruskan ke tombol tahap di lapisan scene. */
+  pointer-events: none;
+}
+
+.river-chapter {
+  display: grid;
+  align-content: end;
+  min-height: 100svh;
+  padding-bottom: calc(var(--spacing-tabbar) + 1.5rem);
+}
+
+.river-hero .text-display {
+  font-size: clamp(2.25rem, 5.2vw, 4.75rem);
+}
+
+.river-text {
+  display: grid;
+  justify-items: start;
+  width: 100%;
+  max-width: var(--container-page);
+  margin-inline: auto;
+  padding-inline: 1rem 3.5rem;
+  text-shadow: 0 1px 24px color-mix(in srgb, var(--scene-night-top) 70%, transparent);
+}
+
+.river-text > * {
+  pointer-events: auto;
+}
+
+.river-text a {
+  text-shadow: none;
+}
+
+@media (min-width: 768px) {
+  .river-scrim {
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--scene-night-top) 82%, transparent) 18%, transparent 62%),
+      linear-gradient(to top, color-mix(in srgb, var(--scene-night-top) 70%, transparent), transparent 45%);
+  }
+
+  .river-chapter {
+    align-content: center;
+    padding-bottom: 0;
+  }
+
+  .river-hero {
+    align-content: end;
+    padding-bottom: 4rem;
+  }
+
+  .river-text {
+    padding-inline: 2rem;
+  }
+}
+
+.river-steps {
+  position: absolute;
+  top: 40%;
+  right: 0.25rem;
+  display: grid;
+  translate: 0 -50%;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 300ms var(--ease-long), visibility 300ms;
+}
+
+.river-steps[data-show] {
+  visibility: visible;
+  opacity: 1;
+}
+
+.river-step {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+}
+
+.river-step::after {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--ink) 45%, transparent);
+  transition: height 300ms var(--ease-long), background-color 300ms;
+}
+
+.river-step[aria-current="step"]::after {
+  height: 1.75rem;
+  background: var(--accent);
+}
+
+/* ---------- Baris tipe ---------- */
+.type-row {
+  display: grid;
+  gap: 0.75rem;
+  padding-block: 1.75rem;
+}
+
+@media (min-width: 768px) {
+  .type-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+.type-word {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 8.5rem);
+  font-stretch: 118%;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.type-row:hover .type-word,
+.type-row:focus-visible .type-word {
+  color: var(--accent);
+}
+
+/* ---------- Peragaan AI: garis pindai ---------- */
+.demo-scan {
+  position: absolute;
+  inset: 0;
+  border-bottom: 3px solid var(--accent);
+  background: linear-gradient(transparent 55%, color-mix(in srgb, var(--accent) 28%, transparent));
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- Gerak saat dimuat, disorot, dan diputar ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  [data-depth] {
+    will-change: transform;
+  }
+
+  /* Judul hero: tiap kata berdiri bergiliran. */
+  .hero-word {
+    display: inline-block;
+    animation: word-in 900ms var(--ease-long) backwards;
+    animation-delay: calc(var(--i) * 80ms);
+  }
+
+  .type-word {
+    transition: color 300ms var(--ease-long);
+  }
+
+  .type-arrow {
+    transition: translate 300ms var(--ease-long);
+  }
+
+  .type-row:hover .type-arrow {
+    translate: 6px 0;
+  }
+
+  /* Peragaan AI */
+  [data-play] .demo-scan {
+    animation: scan 1100ms ease-in-out;
+  }
+
+  [data-play] .demo-word {
+    display: inline-block;
+    animation: demo-in 360ms var(--ease-long) backwards;
+    animation-delay: calc(900ms + var(--i) * 100ms);
+  }
+
+  [data-play] .demo-price {
+    animation: price-pulse 600ms var(--ease-long) 2300ms;
+  }
+}
+
+/* ---------- Gerak yang mengikuti scroll ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    /* Di puncak beranda nav tembus pandang di atas scene. */
+    html:has([data-landing]) .nav-solid {
+      display: none;
+    }
+
+    .statement {
+      view-timeline: --statement block;
+    }
+
+    .statement-word {
+      display: inline-block;
+      animation: word-light linear both;
+      animation-timeline: --statement;
+      animation-range: cover calc(var(--from) * 1%) cover calc(var(--to) * 1%);
+    }
+
+    .type-word {
+      animation: widen linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 55%;
+    }
+
+    /* Kartu di tepi rel mengecil. */
+    .rail-focus > * {
+      animation: rail-focus linear both;
+      animation-timeline: view(inline);
+    }
+
+    .grow-in {
+      animation: grow-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+  }
+}
+
+@keyframes widen {
+  from {
+    font-stretch: 75%;
+  }
+}
+
+@keyframes word-in {
+  from {
+    /* Bukan 0, agar judul tetap dihitung sudah tampil (LCP). */
+    opacity: 0.01;
+    translate: 0 0.6em;
+  }
+}
+
+@keyframes word-light {
+  from {
+    /* 0,5 masih memenuhi kontras teks besar. */
+    opacity: 0.5;
+    translate: 0 0.2em;
+  }
+}
+
+@keyframes rail-focus {
+  entry 0% {
+    scale: 0.84;
+  }
+  entry 100%,
+  exit 0% {
+    scale: 1;
+  }
+  exit 100% {
+    scale: 0.84;
+  }
+}
+
+@keyframes scan {
+  from {
+    opacity: 1;
+    translate: 0 -100%;
+  }
+  90% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    translate: 0 0;
+  }
+}
+
+@keyframes demo-in {
+  from {
+    opacity: 0;
+    translate: 0 0.5em;
+  }
+}
+
+@keyframes price-pulse {
+  50% {
+    scale: 1.05;
+  }
+}
+
+@keyframes grow-in {
+  from {
+    scale: 0.72;
+  }
+}

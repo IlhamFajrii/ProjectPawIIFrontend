@@ -1,0 +1,833 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Satu-satunya tempat nilai warna ditulis. Komponen memakai utility token. */
+:root {
+  --bg: #ffffff;
+  --surface: #f5f5f7;
+  --ink: #1d1d1f;
+  --muted: #5c5e66;
+  --line: #d9d9de;
+  --control: #808088;
+  --accent: #b4231a;
+  --on-accent: #ffffff;
+  --danger: #8f0f3a;
+  --on-danger: #ffffff;
+  --warning: #7a4a00;
+  --success: #1b6332;
+  --backdrop: rgb(0 0 0 / 0.45);
+  --float: 0 12px 40px rgb(0 0 0 / 0.16);
+  color-scheme: light;
+  /* Scene 3D beranda: senja, malam, lalu pagi di kedua tema. */
+  --scene-dusk-top: #0a1230;
+  --scene-dusk-horizon: #8a3a45;
+  --scene-night-top: #02040a;
+  --scene-night-horizon: #152f4d;
+  --scene-dawn-top: #22466f;
+  --scene-dawn-horizon: #d9814f;
+  --scene-sun: #ff9f45;
+  --scene-water: #071422;
+  --scene-steel: #c8261b;
+  --scene-stone: #4a505e;
+  --scene-lamp: #ffb866;
+  --scene-star: #dbe6ff;
+}
+
+/* `.section-contrast` membuat section gelap di tema terang (PRD 7.2). */
+:root[data-theme="dark"],
+.section-contrast,
+/* Di beranda, nav dan tab bar menyatu dengan malam. */
+html:has([data-landing]) :is(.site-header, .tab-bar) {
+  --bg: #05070d;
+  --surface: #121722;
+  --ink: #f5f5f7;
+  --muted: #a9b0bf;
+  --line: #283044;
+  --control: #737c90;
+  --accent: #ff7061;
+  --on-accent: #1f0402;
+  --danger: #ff9db4;
+  --on-danger: #2b0610;
+  --warning: #ffba5c;
+  --success: #7bd88f;
+  --backdrop: rgb(0 0 0 / 0.65);
+  --float: 0 12px 40px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+/* Di tema gelap, selang-seling didapat dengan menukar bg dan surface. */
+:root[data-theme="dark"] .section-contrast {
+  --bg: #121722;
+  --surface: #05070d;
+}
+
+html:has([data-landing]) :is(.site-header, .tab-bar) {
+  color: var(--ink);
+}
+
+.section-contrast {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+@theme {
+  --color-*: initial;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter Variable", system-ui, sans-serif;
+  --font-display: "Mona Sans Variable", var(--font-sans);
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.45;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.45;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.55;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.3;
+  --text-h3--letter-spacing: -0.01em;
+  --text-h3--font-weight: 600;
+  --text-h2: clamp(1.5rem, 2.5vw, 2rem);
+  --text-h2--line-height: 1.2;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h2--font-weight: 600;
+  --text-h1: clamp(2rem, 4vw, 3rem);
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h1--font-weight: 700;
+  --text-display: clamp(2.5rem, 6.4vw, 5.5rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 700;
+
+  --spacing-section: clamp(5rem, 12vw, 10rem);
+  --spacing-nav: 3.5rem;
+  --spacing-tabbar: calc(4rem + env(safe-area-inset-bottom, 0px));
+
+  --container-page: 75rem;
+  --container-prose: 68ch;
+
+  --radius-tile: 28px;
+  --radius-card: 20px;
+  --radius-input: 12px;
+
+  --ease-long: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --shadow-*: initial;
+  --shadow-float: var(--float);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-control: var(--control);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-danger: var(--danger);
+  --color-on-danger: var(--on-danger);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
+}
+
+@layer base {
+  html {
+    /* Fokus tidak tertutup nav atas atau tab bar bawah (WCAG 2.4.11). */
+    scroll-padding-top: calc(var(--spacing-nav) + 1rem);
+    scroll-padding-bottom: calc(var(--spacing-tabbar) + 1rem);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  @media (min-width: 768px) {
+    html {
+      scroll-padding-bottom: 1rem;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    /* Kata atau URL panjang buatan pengguna tidak boleh melebarkan halaman. */
+    overflow-wrap: anywhere;
+  }
+
+  /* Kolom grid boleh menyusut lebih sempit dari isinya. */
+  .grid > * {
+    min-width: 0;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    font-stretch: 112%;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Input minimal 16px agar iOS tidak memperbesar otomatis. */
+  input,
+  select,
+  textarea {
+    font-size: max(1rem, 1em);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  summary,
+  select:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* ---------- MO-08: tekan ---------- */
+.pressable {
+  transition-property: scale, background-color, border-color, color, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-long);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pressable:active:not(:disabled, [aria-disabled="true"]) {
+    scale: 0.97;
+  }
+}
+
+/* ---------- MO-06: modal dan sheet ---------- */
+.dialog {
+  position: fixed;
+  inset: auto 0 0 0;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: min(92dvh, 100%);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-tile) var(--radius-tile) 0 0;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: var(--float);
+  opacity: 0;
+  transition-property: opacity, transform, display, overlay;
+  transition-duration: 200ms;
+  transition-timing-function: var(--ease-long);
+  transition-behavior: allow-discrete;
+}
+
+.dialog:modal {
+  overscroll-behavior: contain;
+}
+
+.dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background: transparent;
+  transition-property: background-color, display, overlay;
+  transition-duration: 200ms;
+  transition-behavior: allow-discrete;
+}
+
+.dialog[open]:where(:not([data-closing])) {
+  opacity: 1;
+  transition-duration: 280ms;
+
+  @starting-style {
+    opacity: 0;
+  }
+
+  &::backdrop {
+    background: var(--backdrop);
+    transition-duration: 280ms;
+
+    @starting-style {
+      background: transparent;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .dialog {
+    inset: 0;
+    margin: auto;
+    width: min(32rem, calc(100% - 3rem));
+    height: fit-content;
+    max-height: min(88dvh, 100%);
+    border-radius: var(--radius-tile);
+  }
+
+  .dialog[data-size="wide"] {
+    width: min(52rem, calc(100% - 3rem));
+  }
+}
+
+/* Layar penuh (galeri). Ditulis setelah breakpoint agar menang di semua lebar. */
+.dialog[data-size="full"] {
+  inset: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dialog {
+    transform: translateY(100%);
+  }
+
+  .dialog[open]:where(:not([data-closing])) {
+    transform: none;
+
+    @starting-style {
+      transform: translateY(100%);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .dialog {
+      transform: translateY(12px) scale(0.96);
+    }
+
+    .dialog[open]:where(:not([data-closing])) {
+      @starting-style {
+        transform: translateY(12px) scale(0.96);
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog,
+  .dialog::backdrop,
+  .dialog[open]:where(:not([data-closing])),
+  .dialog[open]:where(:not([data-closing]))::backdrop {
+    transition-duration: 100ms;
+  }
+}
+
+/* ---------- Popover menu (PU-15) ---------- */
+.menu {
+  /* Cadangan tanpa anchor positioning: pojok kanan di bawah nav. */
+  position: fixed;
+  inset: calc(var(--spacing-nav) + 0.25rem) 1rem auto auto;
+  margin: 0;
+  min-width: 14rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: var(--float);
+}
+
+@supports (position-area: block-end span-inline-start) {
+  .menu {
+    inset: auto;
+    position-area: block-end span-inline-start;
+    position-try-fallbacks: flip-block, flip-inline;
+    margin-block: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .menu {
+    opacity: 0;
+    translate: 0 -0.25rem;
+    transition-property: opacity, translate, display, overlay;
+    transition-duration: 150ms;
+    transition-behavior: allow-discrete;
+  }
+
+  .menu:popover-open {
+    opacity: 1;
+    translate: 0 0;
+
+    @starting-style {
+      opacity: 0;
+      translate: 0 -0.25rem;
+    }
+  }
+}
+
+/* ---------- MO-10: toast ---------- */
+.toast-region {
+  position: fixed;
+  inset: auto 1rem calc(var(--spacing-tabbar) + 0.75rem) 1rem;
+  margin: 0;
+  width: auto;
+  height: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  overflow: visible;
+}
+
+@media (min-width: 768px) {
+  .toast-region {
+    inset: auto 1.5rem 1.5rem auto;
+    width: 24rem;
+  }
+}
+
+.toast {
+  opacity: 1;
+  transition-property: opacity, translate;
+  transition-duration: 220ms;
+  transition-timing-function: var(--ease-long);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toast {
+    translate: 0 0;
+
+    @starting-style {
+      translate: 0 1rem;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition-duration: 100ms;
+  }
+}
+
+/* ---------- MO-01: reveal saat scroll ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .reveal {
+      animation: reveal linear both;
+      /* Inset 0: bawaannya mengikuti scroll-padding, sehingga pudarnya naik ke atas tab bar. */
+      animation-timeline: view(block 0px);
+      /* Selesai dalam 64px pertama (tinggi tab bar), agar teks yang terbaca tidak tinggal pudar. */
+      animation-range: entry 0px entry 64px;
+    }
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+/* ---------- MO-04: hero masuk, sekali ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .enter {
+    animation: enter 600ms var(--ease-long) backwards;
+    animation-delay: calc(var(--enter-index, 0) * 80ms);
+  }
+}
+
+@keyframes enter {
+  from {
+    /* Bukan 0: teks yang transparan penuh tidak dihitung sebagai sudah tampil (LCP). */
+    opacity: 0.01;
+    translate: 0 24px;
+  }
+}
+
+/* ---------- MO-05: nav tembus pandang setelah scroll ---------- */
+.nav-solid {
+  background: var(--bg);
+}
+
+.nav-glass {
+  /* 88% agar teks sekunder tetap >= 4,5:1 saat section gelap lewat di belakangnya. */
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+    .nav-solid {
+      animation: fade-out linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 80px;
+    }
+
+    .nav-glass {
+      animation: fade-in linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 80px;
+    }
+  }
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Tab bar selalu tembus pandang karena konten lewat di bawahnya. */
+.bar-glass {
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+/* Di beranda nav gelap juga lewat di atas section terang, jadi hampir pekat. */
+html:has([data-landing]) :is(.nav-glass, .bar-glass) {
+  background: color-mix(in srgb, var(--bg) 97%, transparent);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav-glass,
+  .bar-glass {
+    background: var(--bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* ---------- MO-07: kartu ke detail ---------- */
+::view-transition-group(*) {
+  animation-duration: 350ms;
+  animation-timing-function: var(--ease-long);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ---------- MO-09: tahap timeline baru ---------- */
+.timeline-new {
+  opacity: 1;
+  transition-property: opacity, translate;
+  transition-duration: 300ms;
+  transition-timing-function: var(--ease-long);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .timeline-new {
+    translate: 0 0;
+
+    @starting-style {
+      translate: 0 8px;
+    }
+  }
+}
+
+/* ---------- MO-11: segmented control ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .segment-thumb {
+    transition: translate 220ms var(--ease-long);
+  }
+}
+
+/* ---------- MO-20: penanda aktif dan perpindahan halaman ---------- */
+.nav-pill,
+.tab-pill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: none;
+  border-radius: 9999px;
+}
+
+.nav-pill {
+  background: var(--surface);
+}
+
+.tab-pill {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+[aria-current="page"] > .nav-pill,
+[aria-current="page"] .tab-pill {
+  display: block;
+}
+
+/* Nama transisi hanya dipasang selagi transisi, agar blur nav tidak terganggu. */
+html:active-view-transition:not([data-reveal]) {
+  .site-header {
+    view-transition-name: site-header;
+  }
+
+  .tab-bar {
+    view-transition-name: tab-bar;
+  }
+
+  [aria-current="page"] > .nav-pill {
+    view-transition-name: nav-pill;
+  }
+
+  [aria-current="page"] .tab-pill {
+    view-transition-name: tab-pill;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: 160ms ease-in both page-out;
+  }
+
+  ::view-transition-new(root) {
+    animation: 420ms var(--ease-long) both page-in;
+  }
+
+  .tab-icon {
+    transition: scale 260ms var(--ease-long);
+  }
+
+  [aria-current="page"] .tab-icon {
+    scale: 1.12;
+  }
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+
+/* ---------- MO-23: ganti tema melingkar ---------- */
+html[data-reveal]::view-transition-old(root) {
+  animation: none;
+}
+
+html[data-reveal]::view-transition-new(root) {
+  animation: 560ms var(--ease-long) both theme-reveal;
+}
+
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--reveal-x) var(--reveal-y));
+  }
+  to {
+    clip-path: circle(150% at var(--reveal-x) var(--reveal-y));
+  }
+}
+
+/* ---------- MO-21: daftar masuk bergiliran, kartu membesar saat disorot ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .stagger > * {
+    animation: stagger-in 480ms var(--ease-long) backwards;
+  }
+
+  .stagger > :nth-child(2) { animation-delay: 40ms; }
+  .stagger > :nth-child(3) { animation-delay: 80ms; }
+  .stagger > :nth-child(4) { animation-delay: 120ms; }
+  .stagger > :nth-child(5) { animation-delay: 160ms; }
+  .stagger > :nth-child(6) { animation-delay: 200ms; }
+  .stagger > :nth-child(7) { animation-delay: 240ms; }
+  .stagger > :nth-child(8) { animation-delay: 280ms; }
+  .stagger > :nth-child(n + 9) { animation-delay: 320ms; }
+
+  .zoom-target {
+    transition: scale 500ms var(--ease-long);
+  }
+
+  @media (hover: hover) {
+    .zoom-host:hover .zoom-target {
+      scale: 1.07;
+    }
+  }
+
+  /* Pesan chat baru */
+  .bubble-new {
+    transform-origin: bottom left;
+    animation: bubble-in 320ms var(--ease-long) backwards;
+  }
+
+  .bubble-own {
+    transform-origin: bottom right;
+  }
+}
+
+@keyframes stagger-in {
+  from {
+    opacity: 0.01;
+    translate: 0 20px;
+  }
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0.01;
+    translate: 0 12px;
+    scale: 0.9;
+  }
+}
+
+/* ---------- MO-22: momen berhasil ---------- */
+.celebrate {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .celebrate {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    pointer-events: none;
+    animation: celebrate-veil 1500ms ease-out both;
+  }
+
+  .celebrate > * {
+    grid-area: 1 / 1;
+  }
+
+  .celebrate-badge {
+    animation: celebrate-pop 620ms var(--ease-long) both;
+  }
+
+  .celebrate-ring {
+    border: 3px solid var(--success);
+    animation: celebrate-ring 900ms var(--ease-long) 180ms both;
+  }
+
+  .celebrate-spark {
+    rotate: calc(var(--i) * 45deg);
+    animation: celebrate-spark 800ms var(--ease-long) 220ms both;
+  }
+}
+
+@keyframes celebrate-veil {
+  0%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes celebrate-pop {
+  from {
+    opacity: 0;
+    scale: 0.3;
+  }
+  60% {
+    opacity: 1;
+    scale: 1.12;
+  }
+}
+
+@keyframes celebrate-ring {
+  from {
+    opacity: 0.9;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 2.6;
+  }
+}
+
+@keyframes celebrate-spark {
+  from {
+    opacity: 1;
+    transform: translateY(-2.5rem) scaleY(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-7rem) scaleY(1);
+  }
+}
+
+/* ---------- Rail horizontal ---------- */
+.rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(75vw, 17rem);
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  padding-block: 0.25rem 1rem;
+}
+
+.rail > * {
+  scroll-snap-align: start;
+}
+
+/* ---------- Skeleton ---------- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--ink) 7%, transparent), transparent);
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .spin {
+    animation: spin 0.9s linear infinite;
+  }
+}
