@@ -28,22 +28,32 @@ function MainLink({ to, children }: { to: string; children: string }) {
   );
 }
 
-function useScrolled(offset: number) {
+/** `scrolled`: sudah lewat `offset`. `down`: sudah lewat `offset` dan sedang scroll ke bawah. */
+function useScrollState(offset: number) {
   const [scrolled, setScrolled] = useState(false);
+  const [downward, setDownward] = useState(false);
   useEffect(() => {
-    const update = () => setScrolled(window.scrollY > offset);
+    let last = window.scrollY;
+    const update = () => {
+      const y = window.scrollY;
+      setScrolled(y > offset);
+      // Getaran kecil jari diabaikan, agar kapsul tidak buka-tutup.
+      if (Math.abs(y - last) < 8) return;
+      setDownward(y > last);
+      last = y;
+    };
     update();
     window.addEventListener('scroll', update, { passive: true });
     return () => window.removeEventListener('scroll', update);
   }, [offset]);
-  return scrolled;
+  return { scrolled, down: scrolled && downward };
 }
 
 export function TopNav() {
   const { status, user, openAuth, retry } = useSession();
   const signOut = useSignOut();
   const loading = useNavigation().state === 'loading';
-  const scrolled = useScrolled(80);
+  const { scrolled, down } = useScrollState(80);
   // Dibuka dari sisi logo dan menu saja, agar tombol di kanan tidak lari saat didekati.
   const [hovered, setHovered] = useState(false);
 
@@ -52,6 +62,7 @@ export function TopNav() {
       <div
         className="island pointer-events-auto flex max-w-full items-center rounded-full p-1"
         data-compact={(scrolled && !hovered) || undefined}
+        data-down={down || undefined}
         onPointerLeave={() => setHovered(false)}
       >
         <div className="flex items-center" onPointerEnter={() => setHovered(true)}>
@@ -84,48 +95,53 @@ export function TopNav() {
             )}
           </span>
         </div>
-        <div className="ml-2 flex items-center gap-1 sm:ml-4">
-          <ThemeToggle />
-          {status === 'guest' && (
-            <Button variant="primary" className="text-sm" onClick={() => openAuth('login')}>
-              Masuk
-            </Button>
-          )}
-          {status === 'error' && (
-            <>
-              <Button variant="text" className="text-sm" onClick={retry}>
-                Muat sesi
-              </Button>
-              <Button variant="secondary" className="text-sm" onClick={() => void signOut()}>
-                Keluar
-              </Button>
-            </>
-          )}
-          {user && (
-            <div className="hidden md:block">
-              <Menu
-                label={`Menu akun ${user.name}`}
-                triggerClass={iconButtonClass}
-                trigger={<Avatar name={user.name} src={user.avatarUrl} />}
-              >
-                <p className="truncate px-3 py-2 text-sm text-muted">{user.name}</p>
-                <Link to="/profil" className={menuItemClass}>
-                  <UserRound className="size-5" aria-hidden="true" />
-                  Profil
-                </Link>
-                {accountLinks(user).map(({ to, label, icon: Icon }) => (
-                  <Link key={to} to={to} className={menuItemClass}>
-                    <Icon className="size-5" aria-hidden="true" />
-                    {label}
-                  </Link>
-                ))}
-                <button type="button" className={menuItemClass} onClick={() => void signOut()}>
-                  <LogOut className="size-5" aria-hidden="true" />
-                  Keluar
-                </button>
-              </Menu>
+        <div className="island-actions">
+          <div className="island-clip">
+            {/* Jarak 4px memberi tempat cincin fokus di dalam area yang dipotong. */}
+            <div className="flex items-center gap-1 py-1 pr-1 pl-2 sm:pl-4">
+              <ThemeToggle />
+              {status === 'guest' && (
+                <Button variant="primary" className="text-sm" onClick={() => openAuth('login')}>
+                  Masuk
+                </Button>
+              )}
+              {status === 'error' && (
+                <>
+                  <Button variant="text" className="text-sm" onClick={retry}>
+                    Muat sesi
+                  </Button>
+                  <Button variant="secondary" className="text-sm" onClick={() => void signOut()}>
+                    Keluar
+                  </Button>
+                </>
+              )}
+              {user && (
+                <div className="hidden md:block">
+                  <Menu
+                    label={`Menu akun ${user.name}`}
+                    triggerClass={iconButtonClass}
+                    trigger={<Avatar name={user.name} src={user.avatarUrl} />}
+                  >
+                    <p className="truncate px-3 py-2 text-sm text-muted">{user.name}</p>
+                    <Link to="/profil" className={menuItemClass}>
+                      <UserRound className="size-5" aria-hidden="true" />
+                      Profil
+                    </Link>
+                    {accountLinks(user).map(({ to, label, icon: Icon }) => (
+                      <Link key={to} to={to} className={menuItemClass}>
+                        <Icon className="size-5" aria-hidden="true" />
+                        {label}
+                      </Link>
+                    ))}
+                    <button type="button" className={menuItemClass} onClick={() => void signOut()}>
+                      <LogOut className="size-5" aria-hidden="true" />
+                      Keluar
+                    </button>
+                  </Menu>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </header>

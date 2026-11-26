@@ -488,9 +488,16 @@ html:has([data-landing]) .tab-bar {
 
 /* Lebar bagian yang muncul dan hilang dianimasikan lewat kolom 1fr <-> 0fr. */
 .island-item,
-.island-activity {
+.island-activity,
+.island-actions {
   display: grid;
   grid-template-columns: 1fr;
+}
+
+/* Menimpa padding island agar cincin fokus tombol tidak terpotong. */
+.island-actions {
+  margin-block: -0.25rem;
+  margin-right: -0.25rem;
 }
 
 .island-activity:not([data-active]) {
@@ -514,13 +521,28 @@ html:has([data-landing]) .tab-bar {
   }
 }
 
+/* Di ponsel kapsul mengikuti arah scroll: ke bawah tinggal logo, ke atas lengkap lagi. */
+@media (width < 48rem) {
+  .island[data-down]:not(:has(:focus-visible), :has(:popover-open)) .island-actions {
+    grid-template-columns: 0fr;
+    margin-right: 0;
+
+    > .island-clip {
+      opacity: 0;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .island-item,
-  .island-activity {
-    transition: grid-template-columns 420ms var(--ease-long);
+  .island-activity,
+  .island-actions {
+    transition:
+      grid-template-columns 420ms var(--ease-long),
+      margin 420ms var(--ease-long);
   }
 
-  .island-item > .island-clip {
+  :is(.island-item, .island-actions) > .island-clip {
     transition: opacity 240ms ease-out;
   }
 
