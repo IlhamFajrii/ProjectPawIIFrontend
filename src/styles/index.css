@@ -27,10 +27,26 @@
   --scene-dawn-top: #22466f;
   --scene-dawn-horizon: #d9814f;
   --scene-sun: #ff9f45;
-  --scene-water: #071422;
-  --scene-steel: #c8261b;
-  --scene-stone: #4a505e;
-  --scene-lamp: #ffb866;
+  --scene-water-dusk: #1d1418;
+  --scene-water: #071018;
+  --scene-water-dawn: #54391f;
+  /* Warna jembatan menurut foto Ampera 2024 sampai 2026. */
+  --scene-steel: #d8362b;
+  --scene-flood: #ff1236;
+  --scene-roof: #93302a;
+  --scene-teal: #2b7f78;
+  --scene-blue: #3552ff;
+  --scene-concrete: #aaa59a;
+  --scene-glass: #223038;
+  --scene-sign: #ffd23a;
+  --scene-cable: #ffac33;
+  --scene-magenta: #ff2d5f;
+  --scene-lamp: #ffe2ad;
+  --scene-clock: #f6f2e4;
+  --scene-ink: #17161a;
+  --scene-train: #e6e9ee;
+  --scene-stripe: #1c55b4;
+  --scene-city: #3b2f33;
   --scene-star: #dbe6ff;
 }
 

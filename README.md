@@ -138,7 +138,7 @@ Setelah mendapat izin sekali pakai dari `POST /api/uploads`, browser mengirim fo
 
 ## Animasi
 
-Pembuka dan cerita Rekber di beranda berjalan di atas satu scene jembatan bergaya Ampera (`src/features/landing/scene.ts`). Scroll menggerakkan kamera, mengangkat bentang tengah selama dana contoh ditahan, dan menyambungkannya lagi setelah dikonfirmasi, sementara langit berubah dari senja ke pagi. Di layar dengan mouse, kamera ikut bergeser halus.
+Pembuka dan cerita Rekber di beranda berjalan di atas satu scene 3D Jembatan Ampera. Modelnya (`src/features/landing/ampera.ts`) disusun dari foto kondisi 2024 sampai 2026: menara dengan rumah kaca dan atap datar, jam yang menunjukkan waktu Palembang, balok bertulis AMPERA, gelagar melengkung, kabel hias, lampu malam, serta jembatan LRT di sampingnya. Bentang tengah asli sudah tidak diangkat; gerak angkat di scene hanya untuk menceritakan Rekber. Kamera dan alur diatur di `scene.ts`. Scroll menggerakkan kamera, mengangkat bentang tengah selama dana contoh ditahan, dan menyambungkannya lagi setelah dikonfirmasi, sementara langit berubah dari senja ke pagi. Di layar dengan mouse, kamera ikut bergeser halus.
 
 Di bagian lain beranda, satu kalimat menyala kata demi kata dan nama tipe melebar saat digulir, disertai parallax GSAP ringan serta peragaan AI. Di dalam aplikasi ada penanda nav yang meluncur saat berpindah halaman, daftar yang masuk bergiliran, perayaan singkat saat dana ditahan atau pesanan selesai, dan pergantian tema melingkar.
 
@@ -159,7 +159,7 @@ Kalau skrip di `index.html` diubah, perbarui hash `sha256-` di `vercel.json`. `n
 
 ## Performa
 
-> Angka di bagian ini diukur sebelum beranda didesain ulang dengan scene 3D dan belum diukur ulang. Potongan JavaScript scene (three.js) sekitar 140 kB gzip dan diunduh saat beranda dibuka.
+> Angka di bagian ini diukur sebelum beranda didesain ulang dengan scene 3D dan belum diukur ulang. Potongan JavaScript scene (three.js) sekitar 152 kB gzip dan diunduh saat beranda dibuka.
 
 Diukur 26 November 2026 pada build production lewat `npm run preview` di komputer development, dengan Lighthouse mode ponsel (jaringan dan CPU disimulasikan), median dari 3 kali jalan. Angka di hosting sungguhan bisa berbeda.
 
