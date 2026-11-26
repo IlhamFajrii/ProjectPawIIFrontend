@@ -3,6 +3,7 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { Button } from '../../../components/ui/Button';
 import { SelectField, TextareaField, TextField } from '../../../components/ui/Field';
 import { FormSummary } from '../../../components/ui/FormSummary';
+import { PhotoPicker } from '../../../components/ui/PhotoPicker';
 import { SegmentedControl } from '../../../components/ui/SegmentedControl';
 import { UrlListFields } from '../../../components/ui/UrlListFields';
 import type { ListingType } from '../../../lib/api/types';
@@ -12,7 +13,6 @@ import { applyServerErrors, flattenErrors } from '../../../lib/formErrors';
 import { zodResolver } from '../../../lib/zodResolver';
 import { listingSchema, MAX_PRICE, type ListingFormInput, type ListingFormOutput } from '../listingSchema';
 import type { AssistantProps } from './assistant';
-import { PhotoPicker } from './PhotoPicker';
 
 const LABELS: Record<keyof ListingFormInput, string> = {
   type: 'Tipe',
@@ -150,6 +150,8 @@ export function ListingForm({ defaultValues, lockType, submitLabel, pending, onS
       />
 
       <PhotoPicker
+        legend="Foto (opsional)"
+        hint="Pakai fotomu sendiri, maksimal 8. Foto pertama menjadi sampul. Foto bisa dilihat siapa saja."
         urls={urls.map((item) => item.url)}
         type={type}
         onAdd={(url) => images.append({ url }, { shouldFocus: false })}

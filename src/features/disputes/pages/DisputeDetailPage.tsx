@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { ExternalLink, Gavel } from 'lucide-react';
+import { Gavel } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
+import { ListingImage } from '../../../components/listing/ListingImage';
 import { OrderSummaryCard } from '../../../components/order/OrderSummaryCard';
 import { OrderTimeline } from '../../../components/order/OrderTimeline';
 import { Button } from '../../../components/ui/Button';
@@ -83,21 +84,12 @@ function Detail({ dispute, order, me }: { dispute: Dispute; order: Order; me: Us
         <p className="break-words whitespace-pre-line">{dispute.description}</p>
         <p className="text-sm text-muted">Diajukan {formatDateTime(dispute.createdAt)}</p>
         {dispute.evidence.length > 0 && (
-          <ul aria-label="Bukti" className="grid gap-1">
+          <ul aria-label="Bukti" className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {dispute.evidence.map((url, index) => (
               <li key={`${url}-${index}`}>
                 {safeUrl(url) ? (
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    referrerPolicy="no-referrer"
-                    className="inline-flex min-h-11 max-w-full items-center gap-2 underline"
-                  >
-                    <ExternalLink className="size-4 shrink-0" aria-hidden="true" />
-                    <span className="truncate">
-                      Bukti {index + 1}: {url}
-                    </span>
+                  <a href={url} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer" className="block rounded-card">
+                    <ListingImage src={url} alt={`Bukti ${index + 1}`} type={order.listingSnapshot.type} compact />
                   </a>
                 ) : (
                   <span className="break-all text-muted">Bukti {index + 1}: tautan tidak aman</span>

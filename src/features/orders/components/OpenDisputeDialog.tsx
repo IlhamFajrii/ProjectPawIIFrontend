@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 import { Button } from '../../../components/ui/Button';
 import { Dialog } from '../../../components/ui/Dialog';
 import { useRequestClose } from '../../../components/ui/dialogContext';
 import { SelectField, TextareaField } from '../../../components/ui/Field';
 import { FormSummary } from '../../../components/ui/FormSummary';
-import { UrlListFields } from '../../../components/ui/UrlListFields';
+import { PhotoPicker } from '../../../components/ui/PhotoPicker';
 import { ApiError } from '../../../lib/api/client';
 import { openDispute } from '../../../lib/api/orders';
 import type { Order } from '../../../lib/api/types';
@@ -46,6 +46,7 @@ export function OpenDisputeDialog({ order, open, onClose }: Props) {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState<string>();
+  const [uploading, setUploading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -59,6 +60,7 @@ export function OpenDisputeDialog({ order, open, onClose }: Props) {
     defaultValues: { reason: '' as Input['reason'], description: '', evidence: [] },
   });
   const evidence = useFieldArray({ control, name: 'evidence' });
+  const photos = useWatch({ control, name: 'evidence' });
 
   const close = () => {
     setMessage(undefined);
@@ -86,11 +88,13 @@ export function OpenDisputeDialog({ order, open, onClose }: Props) {
   });
 
   return (
-    <Dialog open={open} onClose={close} title="Ajukan sengketa" dirty={isDirty} busy={send.isPending}>
+    <Dialog open={open} onClose={close} title="Ajukan sengketa" dirty={isDirty} busy={send.isPending || uploading}>
       <form
         noValidate
         className="grid gap-4"
         onSubmit={handleSubmit((values) => {
+          // Enter saat unggahan berjalan tidak boleh mengirim sengketa tanpa fotonya.
+          if (uploading) return;
           setMessage(undefined);
           send.mutate(values);
         })}
@@ -115,19 +119,20 @@ export function OpenDisputeDialog({ order, open, onClose }: Props) {
           hint="Ceritakan apa yang terjadi, kapan, dan apa yang kamu harapkan."
           error={errors.description?.message}
         />
-        <UrlListFields
-          legend="Bukti (opsional)"
-          hint="Tautan foto atau dokumen yang diawali https://. Maksimal 8."
-          rows={evidence.fields}
-          inputProps={(index) => register(`evidence.${index}.url`)}
-          error={(index) => errors.evidence?.[index]?.url?.message}
-          listError={errors.evidence?.message ?? errors.evidence?.root?.message}
-          onAdd={() => evidence.append({ url: '' })}
+        <PhotoPicker
+          legend="Foto bukti (opsional)"
+          hint="Maksimal 8 foto. Siapa pun yang punya tautannya bisa melihat, jadi tutupi KTP, nomor rekening, dan data pribadi."
+          kind="evidence"
+          type={order.listingSnapshot.type}
+          urls={photos.map((item) => item.url)}
+          error={errors.evidence?.message ?? errors.evidence?.root?.message}
+          onAdd={(url) => evidence.append({ url }, { shouldFocus: false })}
           onRemove={evidence.remove}
+          onBusyChange={setUploading}
         />
         <div className="flex flex-wrap justify-end gap-2">
-          <CancelButton disabled={send.isPending} />
-          <Button type="submit" loading={send.isPending}>
+          <CancelButton disabled={send.isPending || uploading} />
+          <Button type="submit" loading={send.isPending} disabled={uploading}>
             Kirim sengketa
           </Button>
         </div>

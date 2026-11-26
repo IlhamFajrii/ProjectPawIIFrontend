@@ -1,23 +1,28 @@
 import { ImagePlus, Trash2 } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { ListingImage } from '../../../components/listing/ListingImage';
-import { Button } from '../../../components/ui/Button';
-import { iconButtonClass } from '../../../components/ui/buttonClass';
-import type { ListingType } from '../../../lib/api/types';
-import { MAX_URLS } from '../../../lib/schemas';
-import { useCurrentUser } from '../../../lib/session';
-import { uploadPhoto } from '../../../lib/uploadPhoto';
+import type { ListingType } from '../../lib/api/types';
+import { MAX_URLS } from '../../lib/schemas';
+import { useCurrentUser } from '../../lib/session';
+import { uploadPhoto, type PhotoKind } from '../../lib/uploadPhoto';
+import { ListingImage } from '../listing/ListingImage';
+import { Button } from './Button';
+import { iconButtonClass } from './buttonClass';
 
 interface Props {
+  legend: string;
+  hint: string;
+  /** Folder tujuan di Vercel Blob. */
+  kind?: PhotoKind;
   urls: string[];
   type: ListingType;
+  error?: string;
   onAdd: (url: string) => void;
   onRemove: (index: number) => void;
   onBusyChange: (busy: boolean) => void;
 }
 
 /** Memilih foto dari galeri atau kamera, mengunggahnya, dan menampilkan pratinjau. */
-export function PhotoPicker({ urls, type, onAdd, onRemove, onBusyChange }: Props) {
+export function PhotoPicker({ legend, hint, kind, urls, type, error: listError, onAdd, onRemove, onBusyChange }: Props) {
   const user = useCurrentUser();
   const input = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<string>();
@@ -32,7 +37,7 @@ export function PhotoPicker({ urls, type, onAdd, onRemove, onBusyChange }: Props
     try {
       for (const [index, file] of chosen.entries()) {
         setProgress(`Mengunggah foto ${index + 1} dari ${chosen.length}…`);
-        onAdd(await uploadPhoto(file, user._id));
+        onAdd(await uploadPhoto(file, user._id, kind));
       }
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Foto gagal diunggah. Coba lagi.');
@@ -44,10 +49,8 @@ export function PhotoPicker({ urls, type, onAdd, onRemove, onBusyChange }: Props
 
   return (
     <fieldset className="grid min-w-0 gap-3">
-      <legend className="text-sm font-medium">Foto (opsional)</legend>
-      <p className="text-sm text-muted">
-        Pakai fotomu sendiri, maksimal {MAX_URLS}. Foto pertama menjadi sampul. Foto bisa dilihat siapa saja.
-      </p>
+      <legend className="text-sm font-medium">{legend}</legend>
+      <p className="text-sm text-muted">{hint}</p>
 
       {urls.some(Boolean) && (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -96,9 +99,9 @@ export function PhotoPicker({ urls, type, onAdd, onRemove, onBusyChange }: Props
       <p role="status" className="text-sm text-muted empty:hidden">
         {progress}
       </p>
-      {error && (
+      {(error ?? listError) && (
         <p role="alert" className="text-sm font-medium text-danger">
-          {error}
+          {error ?? listError}
         </p>
       )}
     </fieldset>

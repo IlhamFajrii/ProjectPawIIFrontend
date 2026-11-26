@@ -26,7 +26,7 @@ Frontend PUNYA, marketplace lokal Palembang untuk barang, sewa, jasa, dan tugas 
 
 - Jelajah listing dengan pencarian dan filter tipe, kecamatan, kategori, serta harga.
 - Pasang dan ubah listing, dengan unggah foto dari galeri atau kamera.
-- Pesanan dengan tahap Rekber, riwayat status, dan pengajuan sengketa.
+- Pesanan dengan tahap Rekber, riwayat status, dan pengajuan sengketa dengan foto bukti.
 - Chat antara pengguna.
 - Circle untuk kelompok yang saling kenal, dengan vouch antaranggota.
 - Draft listing dari foto dengan bantuan AI.
@@ -132,9 +132,9 @@ Pratinjau semua komponen ada di `http://localhost:5173/_pratinjau` (hanya saat d
 
 ## Unggah foto
 
-Foto listing (maksimal 8 per listing) dan foto profil dipilih dari perangkat. Browser menggambar ulang setiap foto menjadi JPEG maksimal 3 MB sehingga data EXIF, termasuk lokasi, ikut terbuang. Sisi terpanjang foto listing dibatasi 2048 piksel dan foto profil 512 piksel.
+Foto listing (maksimal 8 per listing), foto bukti sengketa (maksimal 8), dan foto profil dipilih dari perangkat. Browser menggambar ulang setiap foto menjadi JPEG maksimal 3 MB sehingga data EXIF, termasuk lokasi, ikut terbuang. Sisi terpanjang foto listing dibatasi 2048 piksel dan foto profil 512 piksel.
 
-Setelah mendapat izin sekali pakai dari `POST /api/uploads`, browser mengirim foto langsung ke Vercel Blob. Database hanya menyimpan URL-nya. Pengguna juga bisa menempel URL `https` secara manual.
+Setelah mendapat izin sekali pakai dari `POST /api/uploads`, browser mengirim foto langsung ke Vercel Blob. Database hanya menyimpan URL-nya. Untuk foto listing dan profil, pengguna juga bisa menempel URL `https` secara manual. Bukti sengketa hanya bisa diunggah.
 
 ## Animasi
 
