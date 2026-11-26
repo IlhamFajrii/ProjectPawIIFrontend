@@ -18,6 +18,9 @@
   --success: #1b6332;
   --backdrop: rgb(0 0 0 / 0.45);
   --float: 0 12px 40px rgb(0 0 0 / 0.16);
+  --island: #000000;
+  --island-edge: rgb(255 255 255 / 0.16);
+  --island-shadow: 0 8px 24px rgb(0 0 0 / 0.22);
   color-scheme: light;
   /* Scene 3D beranda: senja, malam, lalu pagi di kedua tema. */
   --scene-dusk-top: #0a1230;
@@ -53,8 +56,9 @@
 /* `.section-contrast` membuat section gelap di tema terang (PRD 7.2). */
 :root[data-theme="dark"],
 .section-contrast,
-/* Di beranda, nav dan tab bar menyatu dengan malam. */
-html:has([data-landing]) :is(.site-header, .tab-bar) {
+/* Nav atas selalu gelap; di beranda tab bar menyatu dengan malam. */
+.island,
+html:has([data-landing]) .tab-bar {
   --bg: #05070d;
   --surface: #121722;
   --ink: #f5f5f7;
@@ -78,7 +82,8 @@ html:has([data-landing]) :is(.site-header, .tab-bar) {
   --surface: #05070d;
 }
 
-html:has([data-landing]) :is(.site-header, .tab-bar) {
+.island,
+html:has([data-landing]) .tab-bar {
   color: var(--ink);
 }
 
@@ -117,7 +122,7 @@ html:has([data-landing]) :is(.site-header, .tab-bar) {
   --text-display--font-weight: 700;
 
   --spacing-section: clamp(5rem, 12vw, 10rem);
-  --spacing-nav: 3.5rem;
+  --spacing-nav: 4.25rem;
   --spacing-tabbar: calc(4rem + env(safe-area-inset-bottom, 0px));
 
   --container-page: 75rem;
@@ -474,45 +479,58 @@ html:has([data-landing]) :is(.site-header, .tab-bar) {
   }
 }
 
-/* ---------- MO-05: nav tembus pandang setelah scroll ---------- */
-.nav-solid {
-  background: var(--bg);
+/* ---------- MO-05: nav atas ala Dynamic Island ---------- */
+.island {
+  border: 1px solid var(--island-edge);
+  background: var(--island);
+  box-shadow: var(--island-shadow);
 }
 
-.nav-glass {
-  /* 88% agar teks sekunder tetap >= 4,5:1 saat section gelap lewat di belakangnya. */
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--line);
-  opacity: 0;
+/* Lebar bagian yang muncul dan hilang dianimasikan lewat kolom 1fr <-> 0fr. */
+.island-item,
+.island-activity {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.island-activity:not([data-active]) {
+  grid-template-columns: 0fr;
+}
+
+.island-clip {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Setelah scroll tersisa menu aktif. Hanya untuk penunjuk yang bisa menyorot; layar sentuh tetap lengkap. */
+@media (hover: hover) {
+  .island[data-compact]:not(:has(:focus-visible), :has(:popover-open)) .island-item:not(:has([aria-current="page"])) {
+    grid-template-columns: 0fr;
+
+    > .island-clip {
+      opacity: 0;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  @supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-    .nav-solid {
-      animation: fade-out linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0px 80px;
-    }
-
-    .nav-glass {
-      animation: fade-in linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0px 80px;
-    }
+  .island-item,
+  .island-activity {
+    transition: grid-template-columns 420ms var(--ease-long);
   }
-}
 
-@keyframes fade-in {
-  to {
-    opacity: 1;
+  .island-item > .island-clip {
+    transition: opacity 240ms ease-out;
   }
-}
 
-@keyframes fade-out {
-  to {
-    opacity: 0;
+  /* Jeda singkat sebelum menyusut, agar penunjuk yang tergelincir tidak langsung menutupnya. */
+  .island[data-compact] .island-item {
+    transition-delay: 160ms;
+
+    > .island-clip {
+      transition-delay: 160ms;
+    }
   }
 }
 
@@ -523,13 +541,12 @@ html:has([data-landing]) :is(.site-header, .tab-bar) {
   backdrop-filter: blur(20px);
 }
 
-/* Di beranda nav gelap juga lewat di atas section terang, jadi hampir pekat. */
-html:has([data-landing]) :is(.nav-glass, .bar-glass) {
+/* Di beranda tab bar gelap juga lewat di atas section terang, jadi hampir pekat. */
+html:has([data-landing]) .bar-glass {
   background: color-mix(in srgb, var(--bg) 97%, transparent);
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .nav-glass,
   .bar-glass {
     background: var(--bg);
     -webkit-backdrop-filter: none;
@@ -591,7 +608,7 @@ html:has([data-landing]) :is(.nav-glass, .bar-glass) {
 }
 
 .nav-pill {
-  background: var(--surface);
+  background: color-mix(in srgb, var(--ink) 16%, transparent);
 }
 
 .tab-pill {
@@ -605,7 +622,7 @@ html:has([data-landing]) :is(.nav-glass, .bar-glass) {
 
 /* Nama transisi hanya dipasang selagi transisi, agar blur nav tidak terganggu. */
 html:active-view-transition:not([data-reveal]) {
-  .site-header {
+  .island {
     view-transition-name: site-header;
   }
 

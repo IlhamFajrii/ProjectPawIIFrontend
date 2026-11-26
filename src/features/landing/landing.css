@@ -217,11 +217,6 @@
 /* ---------- Gerak yang mengikuti scroll ---------- */
 @media (prefers-reduced-motion: no-preference) {
   @supports ((animation-timeline: view()) and (animation-range: entry)) {
-    /* Di puncak beranda nav tembus pandang di atas scene. */
-    html:has([data-landing]) .nav-solid {
-      display: none;
-    }
-
     .statement {
       view-timeline: --statement block;
     }

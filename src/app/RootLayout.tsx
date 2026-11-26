@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { Outlet, ScrollRestoration, useLocation, useNavigation } from 'react-router';
+import { Outlet, ScrollRestoration, useLocation } from 'react-router';
 import { TabBar } from '../components/layout/TabBar';
 import { TopNav } from '../components/layout/TopNav';
 import { useSession } from '../lib/session';
@@ -21,7 +21,6 @@ function AuthDialogHost() {
 
 export function RootLayout() {
   const { pathname } = useLocation();
-  const loading = useNavigation().state === 'loading';
   const main = useRef<HTMLElement>(null);
   const previous = useRef(pathname);
 
@@ -46,11 +45,6 @@ export function RootLayout() {
         Lewati ke konten
       </a>
       <TopNav />
-      {loading && (
-        <p role="status" className="fixed top-nav right-4 z-40 rounded-full bg-surface px-3 py-1 text-sm">
-          Memuat…
-        </p>
-      )}
       <main id="konten" ref={main} tabIndex={-1} className="pb-tabbar outline-none md:pb-0">
         <Outlet />
       </main>
