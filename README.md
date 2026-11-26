@@ -2,6 +2,21 @@
 
 Frontend PUNYA, marketplace lokal Palembang untuk barang, sewa, jasa, dan tugas bantuan. Pembayaran memakai Rekber simulasi: dana ditandai ditahan sampai pembeli mengonfirmasi, dan tidak ada uang sungguhan yang berpindah.
 
+![React](https://img.shields.io/badge/React-19.3-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.3-06B6D4?logo=tailwindcss&logoColor=white)
+![React Router](https://img.shields.io/badge/React%20Router-8.5-CA4245?logo=reactrouter&logoColor=white)
+![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5.108-FF4154?logo=reactquery&logoColor=white)
+![React Hook Form](https://img.shields.io/badge/React%20Hook%20Form-7.92-EC5990?logo=reacthookform&logoColor=white)
+![Zod](https://img.shields.io/badge/Zod-4.6-3E67B1?logo=zod&logoColor=white)
+![three.js](https://img.shields.io/badge/three.js-0.187-000000?logo=threedotjs&logoColor=white)
+![GSAP](https://img.shields.io/badge/GSAP-3.15-0AE448?logo=gsap&logoColor=black)
+![Vercel Blob](https://img.shields.io/badge/Vercel%20Blob-2.9-000000?logo=vercel&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-5.1-6E9F18?logo=vitest&logoColor=white)
+![ESLint](https://img.shields.io/badge/ESLint-10.15-4B32C3?logo=eslint&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-hosting-000000?logo=vercel&logoColor=white)
+
 | Layanan | Alamat |
 |---|---|
 | Aplikasi web | https://project-paw-ii-frontend.vercel.app |
@@ -19,7 +34,26 @@ Frontend PUNYA, marketplace lokal Palembang untuk barang, sewa, jasa, dan tugas 
 
 ## Teknologi
 
-React 19, TypeScript, Vite, Tailwind CSS 4, React Router 8, TanStack Query, React Hook Form, Zod, GSAP, three.js, dan Vercel Blob. Data berasal dari REST API PUNYA Backend.
+Data berasal dari REST API PUNYA Backend. Versi di bawah adalah yang terpasang saat README ini ditulis.
+
+| Teknologi | Versi | Kegunaan |
+|---|---|---|
+| React dan React DOM | 19.3 | Antarmuka |
+| TypeScript | 6.0 | Bahasa dan pemeriksaan tipe |
+| Vite | 8.3 | Server development dan build |
+| Tailwind CSS | 4.3 | Styling |
+| React Router | 8.5 | Routing |
+| TanStack Query | 5.108 | Pengambilan dan cache data API |
+| React Hook Form | 7.92 | Form |
+| Zod | 4.6 | Validasi input |
+| three.js | 0.187 | Scene 3D jembatan di beranda |
+| GSAP | 3.15 | Parallax saat scroll |
+| Vercel Blob (`@vercel/blob`) | 2.9 | Unggah foto |
+| Lucide React | 1.80 | Ikon |
+| Mona Sans dan Inter (Fontsource) | 5.3 | Font, disajikan dari origin sendiri |
+| Vitest, Testing Library, jsdom | 5.1, 16.3, 31.0 | Test |
+| ESLint dan typescript-eslint | 10.15, 8.74 | Pemeriksaan kode |
+| Vercel | | Hosting |
 
 ## Menjalankan di lokal
 
