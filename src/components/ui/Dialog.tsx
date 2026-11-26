@@ -107,7 +107,7 @@ export function Dialog({
       }}
     >
       <DialogContext value={requestClose}>
-        <div className="flex max-h-[inherit] min-h-full flex-col">
+        <div className="flex min-h-0 grow flex-col">
           <header className="flex items-center justify-between gap-3 py-3 pr-3 pl-5">
             <h1 id={titleId} className="text-h3">
               {title}

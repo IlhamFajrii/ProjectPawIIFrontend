@@ -263,6 +263,13 @@ html:has([data-landing]) .tab-bar {
   overscroll-behavior: contain;
 }
 
+/* Flex agar isi dibatasi max-height dialog dan bagian tengahnya yang menggulir.
+   Persen di dalam min() tidak diwarisi anak, sehingga max-height: inherit tidak membatasi. */
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
 .dialog::backdrop {
   overflow: hidden;
   overscroll-behavior: contain;
