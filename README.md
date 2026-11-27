@@ -185,7 +185,7 @@ Pengukuran ini dilakukan di komputer yang sama saat sedang lebih sibuk, sehingga
 | Sebelum parallax | 90 | 0,77 dtk | 0 | 405 ms | 156,4 kB |
 | Sesudah parallax | 88 | 0,77 dtk | 0 | 464 ms | 160,0 kB |
 
-- GSAP untuk parallax (sekitar 45 kB gzip) baru diunduh saat halaman digulir. Di layar di bawah 1024px, total JavaScript beranda setelah digulir menjadi sekitar 205 kB, di atas angka 180 kB untuk muatan awal.
+- GSAP untuk parallax (sekitar 45 kB gzip) diunduh saat halaman digulir atau saat adegannya sudah tampak. Di layar di bawah 1024px, total JavaScript beranda setelah digulir menjadi sekitar 205 kB, di atas angka 180 kB untuk muatan awal.
 - Menggulir seluruh beranda tanpa pembatasan CPU: persentil 95 waktu antar-frame sama untuk kedua versi (sekitar 18 sampai 24 ms di 1440px, 12 ms di 390px).
 - Dengan CPU 4x lebih lambat: persentil 95 naik dari sekitar 85 ke 91 ms (1440px) dan dari 48 ke 55 sampai 61 ms (390px).
 - Saat scroll pertama di CPU 4x, pemuatan parallax memakan tugas paling lama sekitar 150 ms.
@@ -200,7 +200,7 @@ Berasal dari backend:
 - Chat memakai polling, hanya menampilkan 50 pesan terbaru saat dibuka, tanpa tanda dibaca dan tanpa jumlah belum dibaca.
 - Tidak ada daftar kategori, opsi urutan, atau daftar listing per pengguna.
 - Logout hanya di sisi klien; token tetap berlaku sampai kedaluwarsa.
-- Draft AI membutuhkan `GEMINI_API_KEY` di backend, yang belum diisi di production.
+- Draft AI membutuhkan `GEMINI_API_KEY` dan `GEMINI_MODEL` di backend. `GEMINI_API_KEY` belum diisi di production.
 
 Di frontend:
 
@@ -215,4 +215,4 @@ Di frontend:
 - Pembaca layar.
 - Google Chrome, Safari, dan Firefox asli di perangkat. Pengujian utama memakai Microsoft Edge (Chromium). Firefox dan WebKit bawaan Playwright hanya diuji untuk popup, menu, tema, dan cerita Rekber versi sebelum beranda didesain ulang.
 - Perangkat sentuh sungguhan, termasuk kelancaran gerak di ponsel kelas bawah dan pemilihan foto dari galeri.
-- Alur yang menulis data di backend production. Pengujian alur memakai backend lokal dengan database uji.
+- Seluruh alur lewat web di production. Yang sudah dicoba: unggah foto, foto bukti sengketa, putusan sengketa, dan dialog. Pengujian alur lainnya memakai backend lokal dengan database uji.
